@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <%- include('../layouts/partials/header') %>
+    <%- include('../layouts/partials/flash') %>
+
+    <main class="login-page">
+        <div class="container">
+            <div class="login-container">
+                <div class="login-box">
+                    <div class="login-header">
+                        <i class="fas fa-graduation-cap"></i>
+                        <h1>Welcome to HKMU CourseHub</h1>
+                        <p>Sign in to access course reviews and materials</p>
+                    </div>
+
+                    <div class="login-content">
+                        <a href="/auth/google" class="btn btn-google">
+                            <i class="fab fa-google"></i>
+                            Sign in with Google
+                        </a>
+
+                        <div class="login-info">
+                            <p>
+                                <i class="fas fa-info-circle"></i>
+                                Use your HKMU Google account to sign in
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="login-footer">
+                        <p>By signing in, you agree to our Terms of Service and Privacy Policy</p>
+                    </div>
+                </div>
+
+                <div class="login-features">
+                    <h3>What you can do:</h3>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Read authentic course reviews</li>
+                        <li><i class="fas fa-check"></i> Share your course experiences</li>
+                        <li><i class="fas fa-check"></i> Access study materials</li>
+                        <li><i class="fas fa-check"></i> Upload helpful resources</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../layouts/partials/footer') %>
+    <script src="/js/main.js"></script>
+</body>
+</html>

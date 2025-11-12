@@ -1,0 +1,27 @@
+<% if (typeof success !== 'undefined' && success.length > 0) { %>
+    <div class="flash-messages">
+        <% success.forEach(function(msg) { %>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span><%= msg %></span>
+                <button class="close-btn" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        <% }); %>
+    </div>
+<% } %>
+
+<% if (typeof error !== 'undefined' && error.length > 0) { %>
+    <div class="flash-messages">
+        <% error.forEach(function(msg) { %>
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span><%= msg %></span>
+                <button class="close-btn" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        <% }); %>
+    </div>
+<% } %>

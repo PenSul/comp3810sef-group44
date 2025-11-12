@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <%- include('../../layouts/partials/header') %>
+    <%- include('../../layouts/partials/flash') %>
+
+    <main class="form-page">
+        <div class="container">
+            <div class="form-container">
+                <div class="form-header">
+                    <h1><i class="fas fa-edit"></i> Edit Review</h1>
+                    <p>Update your review for <%= review.courseCode %></p>
+                </div>
+
+                <form action="/reviews/<%= review._id %>/edit" method="POST" class="review-form">
+                    <div class="form-group">
+                        <label>Course Code</label>
+                        <input
+                            type="text"
+                            value="<%= review.courseCode %>"
+                            disabled
+                            class="disabled-input"
+                        >
+                        <input type="hidden" name="courseCode" value="<%= review.courseCode %>">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="semester">Semester <span class="required">*</span></label>
+                            <select id="semester" name="semester" required>
+                                <% semesters.forEach(function(semester) { %>
+                                    <option value="<%= semester %>" <%= review.semester === semester ? 'selected' : '' %>>
+                                        <%= semester %>
+                                    </option>
+                                <% }); %>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="year">Year <span class="required">*</span></label>
+                            <input
+                                type="number"
+                                id="year"
+                                name="year"
+                                min="2020"
+                                max="2030"
+                                value="<%= review.year %>"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="instructor">Instructor <span class="required">*</span></label>
+                        <input
+                            type="text"
+                            id="instructor"
+                            name="instructor"
+                            value="<%= review.instructor %>"
+                            required
+                            maxlength="100"
+                        >
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Ratings</h3>
+
+                        <div class="form-group">
+                            <label for="rating">Overall Rating <span class="required">*</span></label>
+                            <div class="star-rating-input">
+                                <input type="range" id="rating" name="rating" min="1" max="5" value="<%= review.rating %>" required>
+                                <div class="star-display">
+                                    <span class="stars"></span>
+                                    <span class="rating-value"><%= review.rating %>/5</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="difficulty">Difficulty Level <span class="required">*</span></label>
+                            <div class="slider-input">
+                                <input type="range" id="difficulty" name="difficulty" min="1" max="5" value="<%= review.difficulty %>" required>
+                                <div class="slider-labels">
+                                    <span>Easy</span>
+                                    <span class="slider-value"><%= review.difficulty %></span>
+                                    <span>Hard</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="workload">Workload <span class="required">*</span></label>
+                            <div class="slider-input">
+                                <input type="range" id="workload" name="workload" min="1" max="5" value="<%= review.workload %>" required>
+                                <div class="slider-labels">
+                                    <span>Light</span>
+                                    <span class="slider-value"><%= review.workload %></span>
+                                    <span>Heavy</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="grade">Grade Received (Optional)</label>
+                            <select id="grade" name="grade">
+                                <option value="">Select Grade</option>
+                                <% grades.forEach(function(grade) { %>
+                                    <option value="<%= grade %>" <%= review.grade === grade ? 'selected' : '' %>>
+                                        <%= grade %>
+                                    </option>
+                                <% }); %>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Your Review</h3>
+
+                        <div class="form-group">
+                            <label for="reviewText">Review <span class="required">*</span></label>
+                            <textarea
+                                id="reviewText"
+                                name="reviewText"
+                                rows="6"
+                                required
+                                minlength="50"
+                                maxlength="2000"
+                            ><%= review.reviewText %></textarea>
+                            <small>
+                                <span id="charCount"><%= review.reviewText.length %></span>/2000 characters
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Pros (Optional)</label>
+                            <div id="prosContainer">
+                                <% if (review.pros && review.pros.length > 0) { %>
+                                    <% review.pros.forEach(function(pro) { %>
+                                        <input
+                                            type="text"
+                                            name="pros[]"
+                                            value="<%= pro %>"
+                                            maxlength="200"
+                                            class="pro-input"
+                                        >
+                                    <% }); %>
+                                <% } else { %>
+                                    <input type="text" name="pros[]" maxlength="200" class="pro-input">
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cons (Optional)</label>
+                            <div id="consContainer">
+                                <% if (review.cons && review.cons.length > 0) { %>
+                                    <% review.cons.forEach(function(con) { %>
+                                        <input
+                                            type="text"
+                                            name="cons[]"
+                                            value="<%= con %>"
+                                            maxlength="200"
+                                            class="con-input"
+                                        >
+                                    <% }); %>
+                                <% } else { %>
+                                    <input type="text" name="cons[]" maxlength="200" class="con-input">
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tips">Tips for Future Students (Optional)</label>
+                            <textarea
+                                id="tips"
+                                name="tips"
+                                rows="3"
+                                maxlength="500"
+                            ><%= review.tips || '' %></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Update Review
+                        </button>
+                        <a href="/courses/<%= review.courseCode %>" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../../layouts/partials/footer') %>
+    <script src="/js/main.js"></script>
+    <script>
+        // Star rating display
+        const ratingInput = document.getElementById('rating');
+        const starsDisplay = document.querySelector('.star-display .stars');
+        const ratingValue = document.querySelector('.star-display .rating-value');
+
+        function updateStarDisplay() {
+            const value = ratingInput.value;
+            let stars = '';
+            for (let i = 0; i < 5; i++) {
+                stars += i < value ? '★' : '☆';
+            }
+            starsDisplay.textContent = stars;
+            ratingValue.textContent = value + '/5';
+        }
+
+        ratingInput.addEventListener('input', updateStarDisplay);
+        updateStarDisplay();
+
+        // Difficulty slider
+        const difficultyInput = document.getElementById('difficulty');
+        const difficultyValue = difficultyInput.parentElement.querySelector('.slider-value');
+
+        function updateDifficulty() {
+            difficultyValue.textContent = difficultyInput.value;
+        }
+
+        difficultyInput.addEventListener('input', updateDifficulty);
+        updateDifficulty();
+
+        // Workload slider
+        const workloadInput = document.getElementById('workload');
+        const workloadValue = workloadInput.parentElement.querySelector('.slider-value');
+
+        function updateWorkload() {
+            workloadValue.textContent = workloadInput.value;
+        }
+
+        workloadInput.addEventListener('input', updateWorkload);
+        updateWorkload();
+
+        // Character counter
+        const reviewText = document.getElementById('reviewText');
+        const charCount = document.getElementById('charCount');
+
+        reviewText.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+
+        // Form validation
+        const form = document.querySelector('.review-form');
+        form.addEventListener('submit', function(e) {
+            const reviewTextValue = reviewText.value.trim();
+            if (reviewTextValue.length < 50) {
+                e.preventDefault();
+                alert('Review must be at least 50 characters long.');
+                reviewText.focus();
+            }
+        });
+    </script>
+</body>
+</html>

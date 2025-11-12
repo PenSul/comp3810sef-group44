@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <%- include('../../layouts/partials/header') %>
+    <%- include('../../layouts/partials/flash') %>
+
+    <main class="courses-page">
+        <div class="container">
+            <div class="page-header">
+                <h1>Browse Courses</h1>
+                <p>Explore <%= courses.length %> courses with reviews and ratings</p>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="search-filter-section">
+                <form action="/courses" method="GET" class="search-form">
+                    <div class="search-bar">
+                        <input
+                            type="text"
+                            name="search"
+                            placeholder="Search by course code or name..."
+                            value="<%= filters.search || '' %>"
+                            class="search-input"
+                        >
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+
+                    <div class="filters">
+                        <select name="program" class="filter-select">
+                            <option value="">All Programs</option>
+                            <% programs.forEach(function(program) { %>
+                                <option value="<%= program %>" <%= filters.program === program ? 'selected' : '' %>>
+                                    <%= program %>
+                                </option>
+                            <% }); %>
+                        </select>
+
+                        <select name="minRating" class="filter-select">
+                            <option value="">Any Rating</option>
+                            <option value="4" <%= filters.minRating === '4' ? 'selected' : '' %>>4+ Stars</option>
+                            <option value="3" <%= filters.minRating === '3' ? 'selected' : '' %>>3+ Stars</option>
+                        </select>
+
+                        <select name="difficulty" class="filter-select">
+                            <option value="">Any Difficulty</option>
+                            <option value="easy" <%= filters.difficulty === 'easy' ? 'selected' : '' %>>Easy</option>
+                            <option value="medium" <%= filters.difficulty === 'medium' ? 'selected' : '' %>>Medium</option>
+                            <option value="hard" <%= filters.difficulty === 'hard' ? 'selected' : '' %>>Hard</option>
+                        </select>
+
+                        <select name="sort" class="filter-select">
+                            <option value="">Sort By</option>
+                            <option value="rating-high" <%= filters.sort === 'rating-high' ? 'selected' : '' %>>Highest Rated</option>
+                            <option value="rating-low" <%= filters.sort === 'rating-low' ? 'selected' : '' %>>Lowest Rated</option>
+                            <option value="reviews-most" <%= filters.sort === 'reviews-most' ? 'selected' : '' %>>Most Reviews</option>
+                            <option value="difficulty-easy" <%= filters.sort === 'difficulty-easy' ? 'selected' : '' %>>Easiest</option>
+                            <option value="difficulty-hard" <%= filters.sort === 'difficulty-hard' ? 'selected' : '' %>>Hardest</option>
+                        </select>
+
+                        <button type="submit" class="btn btn-secondary">Apply Filters</button>
+                        <a href="/courses" class="btn btn-outline">Clear</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Courses Grid -->
+            <% if (courses.length > 0) { %>
+                <div class="courses-grid">
+                    <% courses.forEach(function(course) { %>
+                        <div class="course-card">
+                            <div class="course-header">
+                                <h3><%= course.courseCode %></h3>
+                                <span class="course-program"><%= course.program %></span>
+                            </div>
+
+                            <h4 class="course-name"><%= course.courseName %></h4>
+
+                            <p class="course-description">
+                                <%= course.description.substring(0, 120) %>...
+                            </p>
+
+                            <div class="course-meta">
+                                <span><i class="fas fa-book"></i> <%= course.credits %> Credits</span>
+                            </div>
+
+                            <div class="course-stats">
+                                <div class="stat">
+                                    <span class="stat-label">Rating</span>
+                                    <span class="stat-value rating">
+                                        <i class="fas fa-star"></i>
+                                        <%= course.averageRating > 0 ? course.averageRating.toFixed(1) : 'N/A' %>
+                                    </span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">Reviews</span>
+                                    <span class="stat-value"><%= course.reviewCount %></span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">Difficulty</span>
+                                    <span class="stat-value">
+                                        <%= course.averageDifficulty > 0 ? course.averageDifficulty.toFixed(1) : 'N/A' %>/5
+                                    </span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">Workload</span>
+                                    <span class="stat-value">
+                                        <%= course.averageWorkload > 0 ? course.averageWorkload.toFixed(1) : 'N/A' %>/5
+                                    </span>
+                                </div>
+                            </div>
+
+                            <a href="/courses/<%= course.courseCode %>" class="btn btn-primary btn-block">
+                                View Details
+                            </a>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <h3>No courses found</h3>
+                    <p>Try adjusting your search or filters</p>
+                    <a href="/courses" class="btn btn-primary">Clear Filters</a>
+                </div>
+            <% } %>
+        </div>
+    </main>
+
+    <%- include('../../layouts/partials/footer') %>
+    <script src="/js/main.js"></script>
+    <script src="/js/search.js"></script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <%- include('../layouts/partials/header') %>
+    <%- include('../layouts/partials/flash') %>
+
+    <main class="home-page">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Welcome to HKMU CourseHub</h1>
+                    <p class="hero-subtitle">
+                        Your trusted source for honest course reviews, ratings, and study materials
+                    </p>
+                    <div class="hero-actions">
+                        <a href="/courses" class="btn btn-primary btn-large">
+                            <i class="fas fa-search"></i> Browse Courses
+                        </a>
+                        <% if (isAuthenticated) { %>
+                            <a href="/reviews/create" class="btn btn-secondary btn-large">
+                                <i class="fas fa-pen"></i> Write a Review
+                            </a>
+                        <% } else { %>
+                            <a href="/auth/login" class="btn btn-secondary btn-large">
+                                <i class="fas fa-sign-in-alt"></i> Get Started
+                            </a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="container">
+                <h2 class="section-title">Why CourseHub?</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3>Honest Reviews</h3>
+                        <p>Read authentic reviews from fellow HKMU students</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3>Study Materials</h3>
+                        <p>Access shared notes, past papers, and resources</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Course Insights</h3>
+                        <p>Get detailed ratings on workload, difficulty, and more</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Community Driven</h3>
+                        <p>Built by students, for students</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Top Courses Section -->
+        <% if (topCourses && topCourses.length > 0) { %>
+            <section class="top-courses">
+                <div class="container">
+                    <h2 class="section-title">Top Rated Courses</h2>
+                    <div class="courses-grid">
+                        <% topCourses.forEach(function(course) { %>
+                            <div class="course-card">
+                                <div class="course-header">
+                                    <h3><%= course.courseCode %></h3>
+                                    <span class="course-program"><%= course.program %></span>
+                                </div>
+                                <h4 class="course-name"><%= course.courseName %></h4>
+
+                                <div class="course-stats">
+                                    <div class="stat">
+                                        <span class="stat-label">Rating</span>
+                                        <span class="stat-value rating">
+                                            <i class="fas fa-star"></i>
+                                            <%= course.averageRating.toFixed(1) %>
+                                        </span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-label">Reviews</span>
+                                        <span class="stat-value"><%= course.reviewCount %></span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-label">Difficulty</span>
+                                        <span class="stat-value"><%= course.averageDifficulty.toFixed(1) %>/5</span>
+                                    </div>
+                                </div>
+
+                                <a href="/courses/<%= course.courseCode %>" class="btn btn-outline">
+                                    View Details
+                                </a>
+                            </div>
+                        <% }); %>
+                    </div>
+
+                    <div class="text-center" style="margin-top: 2rem;">
+                        <a href="/courses" class="btn btn-primary">View All Courses</a>
+                    </div>
+                </div>
+            </section>
+        <% } %>
+
+        <!-- Call to Action -->
+        <section class="cta">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>Ready to Share Your Experience?</h2>
+                    <p>Help fellow students make informed decisions</p>
+                    <% if (isAuthenticated) { %>
+                        <a href="/reviews/create" class="btn btn-primary btn-large">
+                            Write Your First Review
+                        </a>
+                    <% } else { %>
+                        <a href="/auth/login" class="btn btn-primary btn-large">
+                            Login with Google
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <%- include('../layouts/partials/footer') %>
+    <script src="/js/main.js"></script>
+</body>
+</html>

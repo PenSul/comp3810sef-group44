@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <%- include('../../layouts/partials/header') %>
+    <%- include('../../layouts/partials/flash') %>
+
+    <main class="form-page">
+        <div class="container">
+            <div class="form-container">
+                <div class="form-header">
+                    <h1><i class="fas fa-upload"></i> Upload Study Material</h1>
+                    <p>Share helpful resources with fellow students</p>
+                </div>
+
+                <form action="/materials/upload" method="POST" enctype="multipart/form-data" class="material-form">
+                    <div class="form-group">
+                        <label for="courseCode">Course Code <span class="required">*</span></label>
+                        <input
+                            type="text"
+                            id="courseCode"
+                            name="courseCode"
+                            value="<%= course ? course.courseCode : '' %>"
+                            placeholder="e.g., COMP3810"
+                            required
+                            <% if (course) { %>readonly<% } %>
+                        >
+                        <% if (course) { %>
+                            <small><%= course.courseName %></small>
+                        <% } %>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="title">Material Title <span class="required">*</span></label>
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            placeholder="e.g., Midterm Exam Notes 2024"
+                            required
+                            maxlength="200"
+                        >
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="type">Material Type <span class="required">*</span></label>
+                            <select id="type" name="type" required>
+                                <option value="">Select Type</option>
+                                <% materialTypes.forEach(function(type) { %>
+                                    <option value="<%= type %>"><%= type %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="semester">Semester <span class="required">*</span></label>
+                            <select id="semester" name="semester" required>
+                                <option value="">Select Semester</option>
+                                <% semesters.forEach(function(semester) { %>
+                                    <option value="<%= semester %>"><%= semester %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="year">Year <span class="required">*</span></label>
+                            <input
+                                type="number"
+                                id="year"
+                                name="year"
+                                min="2020"
+                                max="2030"
+                                value="2025"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Description (Optional)</label>
+                        <textarea
+                            id="description"
+                            name="description"
+                            rows="3"
+                            placeholder="Briefly describe this material..."
+                            maxlength="500"
+                        ></textarea>
+                        <small>Maximum 500 characters</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="file">Upload File <span class="required">*</span></label>
+                        <div class="file-input-wrapper">
+                            <input
+                                type="file"
+                                id="file"
+                                name="file"
+                                accept=".pdf,.doc,.docx,.ppt,.pptx"
+                                required
+                            >
+                            <div class="file-input-display">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span id="fileName">Choose a file or drag it here</span>
+                            </div>
+                        </div>
+                        <small>
+                            Accepted formats: PDF, DOC, DOCX, PPT, PPTX | Maximum size: 10MB
+                        </small>
+                        <div id="fileInfo" class="file-info" style="display: none;"></div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Important:</strong> Please ensure you have the right to share this material.
+                        Do not upload copyrighted content without permission.
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="uploadBtn">
+                            <i class="fas fa-upload"></i> Upload Material
+                        </button>
+                        <a href="/courses" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <%- include('../../layouts/partials/footer') %>
+    <script src="/js/main.js"></script>
+    <script>
+        const fileInput = document.getElementById('file');
+        const fileName = document.getElementById('fileName');
+        const fileInfo = document.getElementById('fileInfo');
+        const uploadBtn = document.getElementById('uploadBtn');
+
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                const file = this.files[0];
+                fileName.textContent = file.name;
+
+                // Check file size
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+                if (file.size > 10 * 1024 * 1024) {
+                    fileInfo.innerHTML = `
+                        <i class="fas fa-exclamation-triangle"></i>
+                        File too large (${sizeMB}MB). Maximum size is 10MB.
+                    `;
+                    fileInfo.style.display = 'block';
+                    fileInfo.className = 'file-info error';
+                    uploadBtn.disabled = true;
+                } else {
+                    fileInfo.innerHTML = `
+                        <i class="fas fa-check-circle"></i>
+                        File ready: ${file.name} (${sizeMB}MB)
+                    `;
+                    fileInfo.style.display = 'block';
+                    fileInfo.className = 'file-info success';
+                    uploadBtn.disabled = false;
+                }
+            } else {
+                fileName.textContent = 'Choose a file or drag it here';
+                fileInfo.style.display = 'none';
+                uploadBtn.disabled = false;
+            }
+        });
+
+        // Drag and drop
+        const fileInputWrapper = document.querySelector('.file-input-wrapper');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileInputWrapper.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileInputWrapper.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileInputWrapper.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            fileInputWrapper.classList.add('highlight');
+        }
+
+        function unhighlight() {
+            fileInputWrapper.classList.remove('highlight');
+        }
+
+        fileInputWrapper.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            fileInput.dispatchEvent(new Event('change'));
+        }
+    </script>
+</body>
+</html>

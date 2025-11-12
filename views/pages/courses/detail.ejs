@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <%- include('../../layouts/partials/header') %>
+    <%- include('../../layouts/partials/flash') %>
+
+    <main class="course-detail-page">
+        <div class="container">
+            <!-- Course Header -->
+            <div class="course-detail-header">
+                <div class="course-title-section">
+                    <div class="breadcrumb">
+                        <a href="/courses">Courses</a>
+                        <span>/</span>
+                        <span><%= course.courseCode %></span>
+                    </div>
+                    <h1><%= course.courseCode %>: <%= course.courseName %></h1>
+                    <div class="course-meta-info">
+                        <span class="badge"><%= course.program %></span>
+                        <span><i class="fas fa-book"></i> <%= course.credits %> Credits</span>
+                    </div>
+                </div>
+
+                <% if (isAuthenticated && user.isAdmin) { %>
+                    <div class="admin-actions">
+                        <a href="/courses/<%= course.courseCode %>/edit" class="btn btn-secondary">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <form action="/courses/<%= course.courseCode %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure? This will delete all reviews and materials.')">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Course Overview -->
+            <div class="course-overview">
+                <div class="overview-stats">
+                    <div class="stat-box">
+                        <div class="stat-icon rating">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value"><%= course.averageRating > 0 ? course.averageRating.toFixed(2) : 'N/A' %></span>
+                            <span class="stat-label">Average Rating</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value"><%= course.reviewCount %></span>
+                            <span class="stat-label">Reviews</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value"><%= course.averageDifficulty > 0 ? course.averageDifficulty.toFixed(1) : 'N/A' %></span>
+                            <span class="stat-label">Difficulty (1-5)</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-box">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value"><%= course.averageWorkload > 0 ? course.averageWorkload.toFixed(1) : 'N/A' %></span>
+                            <span class="stat-label">Workload (1-5)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Description -->
+            <section class="course-section">
+                <h2>Course Description</h2>
+                <p class="course-description"><%= course.description %></p>
+            </section>
+
+            <!-- Prerequisites -->
+            <% if (course.prerequisites && course.prerequisites.length > 0) { %>
+                <section class="course-section">
+                    <h2>Prerequisites</h2>
+                    <div class="tag-list">
+                        <% course.prerequisites.forEach(function(prereq) { %>
+                            <span class="tag"><%= prereq %></span>
+                        <% }); %>
+                    </div>
+                </section>
+            <% } %>
+
+            <!-- Instructors -->
+            <% if (course.instructors && course.instructors.length > 0) { %>
+                <section class="course-section">
+                    <h2>Instructors</h2>
+                    <div class="tag-list">
+                        <% course.instructors.forEach(function(instructor) { %>
+                            <span class="tag instructor-tag">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <%= instructor %>
+                            </span>
+                        <% }); %>
+                    </div>
+                </section>
+            <% } %>
+
+            <!-- Action Buttons -->
+            <% if (isAuthenticated) { %>
+                <div class="action-buttons">
+                    <a href="/reviews/create?courseCode=<%= course.courseCode %>" class="btn btn-primary">
+                        <i class="fas fa-pen"></i> Write a Review
+                    </a>
+                    <a href="/materials/upload?courseCode=<%= course.courseCode %>" class="btn btn-secondary">
+                        <i class="fas fa-upload"></i> Upload Material
+                    </a>
+                </div>
+            <% } %>
+
+            <!-- Reviews Section -->
+            <section class="reviews-section">
+                <h2>Student Reviews (<%= reviews.length %>)</h2>
+
+                <% if (reviews.length > 0) { %>
+                    <div class="reviews-list">
+                        <% reviews.forEach(function(review) { %>
+                            <div class="review-card">
+                                <div class="review-header">
+                                    <div class="reviewer-info">
+                                        <img src="<%= review.userPhoto %>" alt="<%= review.userName %>" class="reviewer-avatar">
+                                        <div>
+                                            <span class="reviewer-name"><%= review.userName %></span>
+                                            <span class="review-date">
+                                                <%= review.semester %> <%= review.year %> • <%= review.instructor %>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="review-actions">
+                                        <% if (isAuthenticated && (user._id.toString() === review.userId._id.toString() || user.isAdmin)) { %>
+                                            <a href="/reviews/<%= review._id %>/edit" class="btn-icon" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form action="/reviews/<%= review._id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Delete this review?')">
+                                                <button type="submit" class="btn-icon" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        <% } %>
+                                    </div>
+                                </div>
+
+                                <div class="review-ratings">
+                                    <div class="rating-item">
+                                        <span class="rating-label">Overall:</span>
+                                        <span class="rating-stars">
+                                            <% for(let i = 0; i < 5; i++) { %>
+                                                <i class="fas fa-star <%= i < review.rating ? 'filled' : '' %>"></i>
+                                            <% } %>
+                                        </span>
+                                    </div>
+                                    <div class="rating-item">
+                                        <span class="rating-label">Difficulty:</span>
+                                        <span class="rating-value"><%= review.difficulty %>/5</span>
+                                    </div>
+                                    <div class="rating-item">
+                                        <span class="rating-label">Workload:</span>
+                                        <span class="rating-value"><%= review.workload %>/5</span>
+                                    </div>
+                                    <% if (review.grade) { %>
+                                        <div class="rating-item">
+                                            <span class="rating-label">Grade:</span>
+                                            <span class="badge grade-badge"><%= review.grade %></span>
+                                        </div>
+                                    <% } %>
+                                </div>
+
+                                <div class="review-content">
+                                    <p><%= review.reviewText %></p>
+                                </div>
+
+                                <% if (review.pros && review.pros.length > 0) { %>
+                                    <div class="review-list">
+                                        <h4><i class="fas fa-plus-circle text-success"></i> Pros:</h4>
+                                        <ul>
+                                            <% review.pros.forEach(function(pro) { %>
+                                                <li><%= pro %></li>
+                                            <% }); %>
+                                        </ul>
+                                    </div>
+                                <% } %>
+
+                                <% if (review.cons && review.cons.length > 0) { %>
+                                    <div class="review-list">
+                                        <h4><i class="fas fa-minus-circle text-danger"></i> Cons:</h4>
+                                        <ul>
+                                            <% review.cons.forEach(function(con) { %>
+                                                <li><%= con %></li>
+                                            <% }); %>
+                                        </ul>
+                                    </div>
+                                <% } %>
+
+                                <% if (review.tips) { %>
+                                    <div class="review-tips">
+                                        <h4><i class="fas fa-lightbulb"></i> Tips:</h4>
+                                        <p><%= review.tips %></p>
+                                    </div>
+                                <% } %>
+
+                                <div class="review-footer">
+                                    <button class="helpful-btn" data-review-id="<%= review._id %>">
+                                        <i class="fas fa-thumbs-up"></i>
+                                        Helpful (<%= review.helpfulCount %>)
+                                    </button>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state">
+                        <i class="fas fa-comment-slash"></i>
+                        <p>No reviews yet. Be the first to review this course!</p>
+                        <% if (isAuthenticated) { %>
+                            <a href="/reviews/create?courseCode=<%= course.courseCode %>" class="btn btn-primary">
+                                Write First Review
+                            </a>
+                        <% } %>
+                    </div>
+                <% } %>
+            </section>
+
+            <!-- Study Materials Section -->
+            <section class="materials-section">
+                <h2>Study Materials (<%= materials.length %>)</h2>
+
+                <% if (materials.length > 0) { %>
+                    <div class="materials-list">
+                        <% materials.forEach(function(material) { %>
+                            <div class="material-card">
+                                <div class="material-icon">
+                                    <i class="fas fa-file-pdf"></i>
+                                </div>
+                                <div class="material-info">
+                                    <h4><%= material.title %></h4>
+                                    <p class="material-meta">
+                                        <%= material.type %> •
+                                        <%= material.semester %> <%= material.year %> •
+                                        Uploaded by <%= material.uploaderName %>
+                                    </p>
+                                    <% if (material.description) { %>
+                                        <p class="material-description"><%= material.description %></p>
+                                    <% } %>
+                                </div>
+                                <div class="material-actions">
+                                    <a href="/materials/<%= material._id %>/download" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-download"></i> Download
+                                    </a>
+                                    <% if (isAuthenticated && (user._id.toString() === material.uploadedBy.toString() || user.isAdmin)) { %>
+                                        <form action="/materials/<%= material._id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Delete this material?')">
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <p>No materials uploaded yet.</p>
+                        <% if (isAuthenticated) { %>
+                            <a href="/materials/upload?courseCode=<%= course.courseCode %>" class="btn btn-primary">
+                                Upload First Material
+                            </a>
+                        <% } %>
+                    </div>
+                <% } %>
+            </section>
+        </div>
+    </main>
+
+    <%- include('../../layouts/partials/footer') %>
+    <script src="/js/main.js"></script>
+    <script src="/js/reviews.js"></script>
+</body>
+</html>
