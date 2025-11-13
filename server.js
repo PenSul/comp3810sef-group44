@@ -7,6 +7,7 @@ require('dotenv').config();
 
 const express = require('express');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const flash = require('connect-flash');
 const helmet = require('helmet');
@@ -33,6 +34,11 @@ configurePassport();
 // ========== VIEW ENGINE ==========
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+// ========== TRUST PROXY ==========
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 
 // ========== MIDDLEWARE ==========
 // Security
@@ -75,7 +81,10 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   },
+  name: 'hkmu.sid',
+  proxy: process.env.NODE_ENV === 'production',
 }));
 
 // Passport
