@@ -49,7 +49,7 @@ const getCourse = asyncHandler(async (req, res) => {
 });
 
 /**
- * POST /api/courses - Create new course (admin only)
+ * POST /api/courses - Create new course (PUBLIC - NO AUTH)
  */
 const createCourse = asyncHandler(async (req, res) => {
   const courseData = {
@@ -71,7 +71,7 @@ const createCourse = asyncHandler(async (req, res) => {
 });
 
 /**
- * PUT /api/courses/:courseCode - Update course (admin only)
+ * PUT /api/courses/:courseCode - Update course (PUBLIC - NO AUTH)
  */
 const updateCourse = asyncHandler(async (req, res) => {
   const { courseCode } = req.params;
@@ -101,7 +101,7 @@ const updateCourse = asyncHandler(async (req, res) => {
 });
 
 /**
- * DELETE /api/courses/:courseCode - Delete course (admin only)
+ * DELETE /api/courses/:courseCode - Delete course (PUBLIC - NO AUTH)
  */
 const deleteCourse = asyncHandler(async (req, res) => {
   const { courseCode } = req.params;
@@ -163,14 +163,23 @@ const getReview = asyncHandler(async (req, res) => {
 });
 
 /**
- * POST /api/reviews - Create new review
+ * POST /api/reviews - Create new review (PUBLIC - NO AUTH)
+ * Note: Since no authentication, userId must be provided in request body
  */
 const createReview = asyncHandler(async (req, res) => {
+  // Check if userId is provided in body (since no auth)
+  if (!req.body.userId) {
+    return res.status(400).json({
+      success: false,
+      error: 'userId is required in request body',
+    });
+  }
+
   const reviewData = {
     courseCode: req.body.courseCode.toUpperCase(),
-    userId: req.user._id,
-    userName: req.user.name,
-    userPhoto: req.user.photo,
+    userId: req.body.userId, // From request body instead of req.user
+    userName: req.body.userName || 'Anonymous',
+    userPhoto: req.body.userPhoto || '',
     semester: req.body.semester,
     year: parseInt(req.body.year),
     instructor: req.body.instructor,
@@ -193,7 +202,8 @@ const createReview = asyncHandler(async (req, res) => {
 });
 
 /**
- * PUT /api/reviews/:reviewId - Update review
+ * PUT /api/reviews/:reviewId - Update review (PUBLIC - NO AUTH)
+ * Note: No ownership check since authentication is removed
  */
 const updateReview = asyncHandler(async (req, res) => {
   const { reviewId } = req.params;
@@ -206,13 +216,7 @@ const updateReview = asyncHandler(async (req, res) => {
     });
   }
 
-  // Check ownership
-  if (existingReview.userId._id.toString() !== req.user._id.toString()) {
-    return res.status(403).json({
-      success: false,
-      error: 'You can only update your own reviews',
-    });
-  }
+  // NO OWNERSHIP CHECK - Anyone can update any review
 
   const updateData = {
     semester: req.body.semester,
@@ -237,7 +241,8 @@ const updateReview = asyncHandler(async (req, res) => {
 });
 
 /**
- * DELETE /api/reviews/:reviewId - Delete review
+ * DELETE /api/reviews/:reviewId - Delete review (PUBLIC - NO AUTH)
+ * Note: No ownership check since authentication is removed
  */
 const deleteReview = asyncHandler(async (req, res) => {
   const { reviewId } = req.params;
@@ -250,13 +255,7 @@ const deleteReview = asyncHandler(async (req, res) => {
     });
   }
 
-  // Check ownership or admin
-  if (review.userId._id.toString() !== req.user._id.toString() && !req.user.isAdmin) {
-    return res.status(403).json({
-      success: false,
-      error: 'You can only delete your own reviews',
-    });
-  }
+  // NO OWNERSHIP CHECK - Anyone can delete any review
 
   await reviewService.deleteReview(reviewId);
 
