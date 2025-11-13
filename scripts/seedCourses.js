@@ -7,7 +7,7 @@ const courses = [
     courseCode: 'COMP3810SEF',
     courseName: 'Server-side Technologies And Cloud Computing',
     program: 'Computer Science',
-    credits: 5,
+    credits: 3,
     description: 'This course focuses on developing students capabilities in writing programs that run on computer networks and leverage modern, scalable infrastructure.',
     level: 'Year 3',
     prerequisites: [],
@@ -25,7 +25,7 @@ async function seedCourses() {
 
     // Clear existing courses (optional - remove if you want to keep existing)
     // await Course.deleteMany({});
-    // console.log('🗑️  Cleared existing courses');
+    // console.log('Cleared existing courses');
 
     // Insert courses
     const result = await Course.insertMany(courses);

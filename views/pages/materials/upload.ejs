@@ -27,7 +27,7 @@
                             id="courseCode"
                             name="courseCode"
                             value="<%= course ? course.courseCode : '' %>"
-                            placeholder="e.g., COMP3810"
+                            placeholder="e.g., COMP3810SEF"
                             required
                             <% if (course) { %>readonly<% } %>
                         >
@@ -102,7 +102,7 @@
                                 type="file"
                                 id="file"
                                 name="file"
-                                accept=".pdf,.doc,.docx,.ppt,.pptx"
+                                accept=".pdf"
                                 required
                             >
                             <div class="file-input-display">
@@ -111,7 +111,7 @@
                             </div>
                         </div>
                         <small>
-                            Accepted formats: PDF, DOC, DOCX, PPT, PPTX | Maximum size: 10MB
+                            Accepted formats: PDF | Maximum size: 10MB
                         </small>
                         <div id="fileInfo" class="file-info" style="display: none;"></div>
                     </div>
