@@ -4,34 +4,32 @@
 
 const express = require('express');
 const apiController = require('../controllers/apiController');
-const { ensureAuthenticated, ensureAdmin } = require('../middleware/auth');
 const { validateApiReview, handleApiValidationErrors } = require('../middleware/validation');
 
 const router = express.Router();
 
-// ===== COURSE API =====
+// ===== COURSE API (PUBLIC) =====
 router.get('/courses', apiController.getCourses);
 router.get('/courses/:courseCode', apiController.getCourse);
-router.post('/courses', ensureAdmin, apiController.createCourse);
-router.put('/courses/:courseCode', ensureAdmin, apiController.updateCourse);
-router.delete('/courses/:courseCode', ensureAdmin, apiController.deleteCourse);
+router.post('/courses', apiController.createCourse);
+router.put('/courses/:courseCode', apiController.updateCourse);
+router.delete('/courses/:courseCode', apiController.deleteCourse);
 
-// ===== REVIEW API =====
+// ===== REVIEW API (PUBLIC) =====
 router.get('/reviews', apiController.getReviews);
 router.get('/reviews/:reviewId', apiController.getReview);
 router.post('/reviews',
-  ensureAuthenticated,
   validateApiReview,
   handleApiValidationErrors,
   apiController.createReview
 );
-router.put('/reviews/:reviewId', ensureAuthenticated, apiController.updateReview);
-router.delete('/reviews/:reviewId', ensureAuthenticated, apiController.deleteReview);
+router.put('/reviews/:reviewId', apiController.updateReview);
+router.delete('/reviews/:reviewId', apiController.deleteReview);
 
-// ===== MATERIAL API =====
+// ===== MATERIAL API (PUBLIC) =====
 router.get('/materials', apiController.getMaterials);
 
-// ===== STATS API =====
+// ===== STATS API (PUBLIC) =====
 router.get('/stats/top-courses', apiController.getTopCourses);
 router.get('/stats/recent-reviews', apiController.getRecentReviews);
 
