@@ -25,6 +25,19 @@ router.get('/google/callback',
     failureRedirect: '/auth/login',
     failureFlash: true
   }),
+  (req, res, next) => {
+    // Explicitly save the session before redirecting
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        req.flash('error', 'Authentication error. Please try again.');
+        return res.redirect('/auth/login');
+      }
+      
+      console.log('Session saved successfully for user:', req.user?.email || 'unknown');
+      next();
+    });
+  },
   authController.oauthCallback
 );
 
