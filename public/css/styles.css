@@ -1566,6 +1566,7 @@ img {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
 }
 
 .login-features h3 {
@@ -1576,6 +1577,9 @@ img {
 
 .login-features ul {
   list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .login-features li {
