@@ -1599,9 +1599,16 @@ img {
   padding: var(--spacing-lg) 0;
 }
 
+.error-page .container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .error-content {
   text-align: center;
   max-width: min(95%, 600px);
+  width: 100%;
 }
 
 .error-icon {
